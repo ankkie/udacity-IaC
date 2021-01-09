@@ -70,23 +70,23 @@ Resources:
         ToPort: 80
         CidrIp: 0.0.0.0/0
   
-  BastionServerSecGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow SSH from local only
-      VpcId:
-        Fn::ImportValue:
-          !Sub "${EnvironmentName}-VPCID"
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
+  # BastionServerSecGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: Allow SSH from local only
+  #     VpcId:
+  #       Fn::ImportValue:
+  #         !Sub "${EnvironmentName}-VPCID"
+  #     SecurityGroupIngress:
+  #     - IpProtocol: tcp
+  #       FromPort: 22
+  #       ToPort: 22
+  #       CidrIp: 0.0.0.0/0
+  #     SecurityGroupEgress:
+  #     - IpProtocol: tcp
+  #       FromPort: 0
+  #       ToPort: 65535
+  #       CidrIp: 0.0.0.0/0
 
   WebServerSecGroup:
     Type: AWS::EC2::SecurityGroup
@@ -100,31 +100,32 @@ Resources:
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+      # - IpProtocol: tcp
+      #   FromPort: 22
+      #   ToPort: 22
+      #   CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: tcp
         FromPort: 0
         ToPort: 65535
         CidrIp: 0.0.0.0/0
 
-  BastionServer:
-    Type: AWS::EC2::Instance
-    Properties: 
-      SubnetId: 
-        Fn::ImportValue: 
-          !Sub "${EnvironmentName}-PUB1-SN"
-      ImageId: !Ref BastionServerImageId
-      KeyName: bastion
-      SecurityGroupIds:
-       - !GetAtt BastionServerSecGroup.GroupId
-      InstanceType: !Ref ServerInstanceType
-      BlockDeviceMappings: 
-      - DeviceName: "/dev/sdk"
-        Ebs: 
-          VolumeSize: !Ref ServerVolumeSize
+  # Bastion Server configuration to debug any issues within web app servers
+  # BastionServer:
+  #   Type: AWS::EC2::Instance
+  #   Properties: 
+  #     SubnetId: 
+  #       Fn::ImportValue: 
+  #         !Sub "${EnvironmentName}-PUB1-SN"
+  #     ImageId: !Ref BastionServerImageId
+  #     KeyName: bastion
+  #     SecurityGroupIds:
+  #      - !GetAtt BastionServerSecGroup.GroupId
+  #     InstanceType: !Ref ServerInstanceType
+  #     BlockDeviceMappings: 
+  #     - DeviceName: "/dev/sdk"
+  #       Ebs: 
+  #         VolumeSize: !Ref ServerVolumeSize
 
   WebAppLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
@@ -149,7 +150,7 @@ Resources:
           EOF
       ImageId: !Ref WebServerImageId
       IamInstanceProfile: !Ref ProfileWithRolesForApp
-      KeyName: web-server
+      # KeyName: web-server
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: !Ref ServerInstanceType
